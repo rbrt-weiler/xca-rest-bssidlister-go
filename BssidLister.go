@@ -99,7 +99,7 @@ func xcaAuthentication() error {
 	// Empty token structure to start with.
 	var tokenData oAuthToken
 
-	var tokenURL string = fmt.Sprintf("https://%s:5825/management/v1/oauth2/token", config.XCAHost)
+	var tokenURL string = fmt.Sprintf("https://%s:%d/management/v1/oauth2/token", config.XCAHost, config.XCAPort)
 	httpTransport := &http.Transport{
 		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
 	}
@@ -170,7 +170,7 @@ func xcaAuthentication() error {
 }
 
 func getSSIDs() error {
-	var apURL string = fmt.Sprintf("https://%s:5825/management/v1/aps", config.XCAHost)
+	var apURL string = fmt.Sprintf("https://%s:%d/management/v1/aps", config.XCAHost, config.XCAPort)
 	httpTransport := &http.Transport{
 		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
 	}
