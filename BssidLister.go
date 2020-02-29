@@ -84,8 +84,10 @@ const (
 
 // Error codes.
 const (
-	errSuccess int = 0 // No error
-	errUsage   int = 1 // Usage error
+	errSuccess int = 0  // No error
+	errUsage   int = 1  // Usage error
+	errXCAAuth int = 10 // Authentication error
+	errAPICall int = 11 // API Call error
 )
 
 // Variables used to pass data between functions.
@@ -289,10 +291,12 @@ func main() {
 
 	if authErr := xcaAuthentication(); authErr != nil {
 		fmt.Printf("Could not authenticate: %s\n", authErr)
+		os.Exit(errXCAAuth)
 	}
 
 	if ssidErr := getSSIDs(); ssidErr != nil {
 		fmt.Printf("Could not obtain AP list: %s\n", ssidErr)
+		os.Exit(errAPICall)
 	}
 
 	fmt.Printf("\"%s\",\"%s\",\"%s\",\"%s\"\n", "serial", "radio", "bssid", "ssid")
@@ -303,4 +307,6 @@ func main() {
 			}
 		}
 	}
+
+	os.Exit(errSuccess)
 }
