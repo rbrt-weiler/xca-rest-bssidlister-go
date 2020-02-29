@@ -75,7 +75,7 @@ type apResultSet []struct {
 // Definitions used within the code.
 const (
 	toolName     string = "BssidLister.go"
-	toolVersion  string = "0.1.0"
+	toolVersion  string = "0.1.1"
 	toolID       string = toolName + "/" + toolVersion
 	toolURL      string = "https://gitlab.com/rbrt-weiler/xca-rest-bssidlister-go"
 	envFileName  string = ".xcaenv"
