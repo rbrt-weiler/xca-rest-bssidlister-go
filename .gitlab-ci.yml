@@ -31,6 +31,7 @@ variables:
 .dependency_command: &dependency_command
 - go get github.com/joho/godotenv
 - go get gitlab.com/rbrt-weiler/go-module-envordef
+- go get gitlab.com/rbrt-weiler/go-module-xcarestclient
 
 .build_command: &build_command
 - go build -o binaries/BssidLister ./...
