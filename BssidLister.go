@@ -1,9 +1,6 @@
 package main
 
 import (
-	"bytes"
-	"crypto/tls"
-	"encoding/base64"
 	"encoding/json"
 	"flag"
 	"fmt"
@@ -12,10 +9,10 @@ import (
 	"os"
 	"path"
 	"strings"
-	"time"
 
 	godotenv "github.com/joho/godotenv"
 	envordef "gitlab.com/rbrt-weiler/go-module-envordef"
+	xcarestclient "gitlab.com/rbrt-weiler/go-module-xcarestclient"
 )
 
 // AppConfig stores the application configuration once parsed by flags.
@@ -26,36 +23,6 @@ type appConfig struct {
 	XCAUserID    string
 	XCASecret    string
 	PrintVersion bool
-}
-
-type oAuthRequest struct {
-	GrantType string `json:"grantType"`
-	UserID    string `json:"userId"`
-	Password  string `json:"password"`
-	Scope     string `json:"scope"`
-}
-
-type oAuthToken struct {
-	AccessToken  string `json:"access_token"`
-	TokenType    string `json:"token_type"`
-	ExpiresIn    int    `json:"expires_in"`
-	IdleTimeout  int    `json:"idle_timeout"`
-	RefreshToken string `json:"refresh_token"`
-	AdminRole    string `json:"adminRole"`
-	TokenHeader  struct {
-		KID      string `json:"kid"`
-		Type     string `json:"typ"`
-		Algorith string `json:"alg"`
-	}
-	TokenPayload struct {
-		JWTID            string    `json:"jti"`
-		Subject          string    `json:"sub"`
-		Issuer           string    `json:"iss"`
-		ExtremeRole      string    `json:"extreme_role"`
-		ExpiresAt        time.Time `json:"-"`
-		ExpiresAtUnixfmt int64     `json:"exp"`
-	}
-	TokenSignature []byte
 }
 
 type apResultSet []struct {
@@ -75,7 +42,7 @@ type apResultSet []struct {
 // Definitions used within the code.
 const (
 	toolName     string = "BssidLister.go"
-	toolVersion  string = "0.1.1"
+	toolVersion  string = "0.2.0"
 	toolID       string = toolName + "/" + toolVersion
 	toolURL      string = "https://gitlab.com/rbrt-weiler/xca-rest-bssidlister-go"
 	envFileName  string = ".xcaenv"
@@ -93,109 +60,21 @@ const (
 // Variables used to pass data between functions.
 var (
 	config   appConfig
-	xcaToken oAuthToken
+	xca      xcarestclient.RESTClient
 	apResult apResultSet
 )
 
-func xcaAuthentication() error {
-	// Empty token structure to start with.
-	var tokenData oAuthToken
-
-	var tokenURL string = fmt.Sprintf("https://%s:%d/management/v1/oauth2/token", config.XCAHost, config.XCAPort)
-	httpTransport := &http.Transport{
-		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
-	}
-	httpClient := &http.Client{
-		Timeout:   time.Second * time.Duration(config.HTTPTimeout),
-		Transport: httpTransport,
-	}
-
-	var tokenRequest oAuthRequest
-	tokenRequest.GrantType = "password"
-	tokenRequest.UserID = config.XCAUserID
-	tokenRequest.Password = config.XCASecret
-	tokenRequest.Scope = ""
-
-	// Generate an actual HTTP request.
-	payload, _ := json.Marshal(tokenRequest)
-	req, reqErr := http.NewRequest(http.MethodPost, tokenURL, bytes.NewBuffer(payload))
-	if reqErr != nil {
-		return fmt.Errorf("could not create HTTP(S) request: %s", reqErr)
-	}
-	req.Header.Set("User-Agent", toolID)
-	req.Header.Set("Cache-Control", "no-cache")
-	req.Header.Set("Accept", jsonMimeType)
-	req.Header.Set("Content-Type", jsonMimeType)
-
-	// Try to get a result from the API.
-	res, resErr := httpClient.Do(req)
-	if resErr != nil {
-		return fmt.Errorf("could not connect to XMC: %s", resErr)
-	}
-	if res.StatusCode != http.StatusOK {
-		return fmt.Errorf("got status code %d instead of %d", res.StatusCode, http.StatusOK)
-	}
-	defer res.Body.Close()
-
-	// Check if the HTTP response has yielded the expected content type.
-	resContentType := res.Header.Get("Content-Type")
-	if strings.Index(resContentType, jsonMimeType) != 0 {
-		return fmt.Errorf("Content-Type %s returned instead of %s", resContentType, jsonMimeType)
-	}
-
-	// Read and parse the body of the HTTP response.
-	body, bodyErr := ioutil.ReadAll(res.Body)
-	if bodyErr != nil {
-		return fmt.Errorf("could not read server response: %s", bodyErr)
-	}
-	jsonErr := json.Unmarshal(body, &tokenData)
-	if jsonErr != nil {
-		return fmt.Errorf("could not read server response: %s", jsonErr)
-	}
-
-	tokenFields := strings.Split(tokenData.AccessToken, ".")
-	tokenHeader, _ := base64.RawURLEncoding.DecodeString(tokenFields[0])
-	if headerErr := json.Unmarshal(tokenHeader, &tokenData.TokenHeader); headerErr != nil {
-		fmt.Printf("Could not decode header: %s\n", headerErr)
-	}
-	tokenPayload, _ := base64.RawURLEncoding.DecodeString(tokenFields[1])
-	if payloadErr := json.Unmarshal(tokenPayload, &tokenData.TokenPayload); payloadErr != nil {
-		fmt.Printf("Could not decode payload: %s\n", payloadErr)
-	}
-	tokenData.TokenPayload.ExpiresAt = time.Unix(tokenData.TokenPayload.ExpiresAtUnixfmt, 0)
-	tokenSignature, _ := base64.RawURLEncoding.DecodeString(tokenFields[2])
-	tokenData.TokenSignature = tokenSignature
-
-	xcaToken = tokenData
-
-	return nil
-}
-
 func getSSIDs() error {
-	var apURL string = fmt.Sprintf("https://%s:%d/management/v1/aps", config.XCAHost, config.XCAPort)
-	httpTransport := &http.Transport{
-		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
-	}
-	httpClient := &http.Client{
-		Timeout:   time.Second * time.Duration(config.HTTPTimeout),
-		Transport: httpTransport,
-	}
-
-	req, reqErr := http.NewRequest(http.MethodGet, apURL, nil)
+	req, reqErr := xca.GetRequest("v1/aps", nil)
 	if reqErr != nil {
 		return fmt.Errorf("could not create HTTP(S) request: %s", reqErr)
 	}
-	req.Header.Set("User-Agent", toolID)
-	req.Header.Set("Cache-Control", "no-cache")
-	req.Header.Set("Accept", jsonMimeType)
-	//req.Header.Set("Content-Type", jsonMimeType)
-	req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", xcaToken.AccessToken))
 	query := req.URL.Query()
 	query.Add("inventory", "true")
 	req.URL.RawQuery = query.Encode()
 
 	// Try to get a result from the API.
-	res, resErr := httpClient.Do(req)
+	res, resErr := xca.PerformRequest(req)
 	if resErr != nil {
 		return fmt.Errorf("could not connect to XCA: %s", resErr)
 	}
@@ -289,7 +168,13 @@ func main() {
 		os.Exit(errSuccess)
 	}
 
-	if authErr := xcaAuthentication(); authErr != nil {
+	xca = xcarestclient.New(config.XCAHost)
+	xca.SetPort(config.XCAPort)
+	xca.UseInsecureHTTPS()
+	xca.SetAuth(config.XCAUserID, config.XCASecret)
+	xca.SetUserAgent(toolID)
+
+	if authErr := xca.Authenticate(); authErr != nil {
 		fmt.Printf("Could not authenticate: %s\n", authErr)
 		os.Exit(errXCAAuth)
 	}
