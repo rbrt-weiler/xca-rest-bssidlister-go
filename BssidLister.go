@@ -42,7 +42,7 @@ type apResultSet []struct {
 // Definitions used within the code.
 const (
 	toolName     string = "BssidLister.go"
-	toolVersion  string = "0.2.0"
+	toolVersion  string = "0.2.1"
 	toolID       string = toolName + "/" + toolVersion
 	toolURL      string = "https://gitlab.com/rbrt-weiler/xca-rest-bssidlister-go"
 	envFileName  string = ".xcaenv"
@@ -65,7 +65,7 @@ var (
 )
 
 func getSSIDs() error {
-	req, reqErr := xca.GetRequest("v1/aps", nil)
+	req, reqErr := xca.GetRequest("v1/aps")
 	if reqErr != nil {
 		return fmt.Errorf("could not create HTTP(S) request: %s", reqErr)
 	}
