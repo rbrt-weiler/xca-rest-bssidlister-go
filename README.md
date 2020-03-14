@@ -2,7 +2,7 @@
 
 BssidLister retrieves the list of Access Points and associated (B)SSIDs from [ExtremeCloud Appliance](https://www.extremenetworks.com/product/extremecloud-appliance/) (XCA) via the provided REST API and prints CSV to stdout.
 
-It is basically a rewrite of [the Python script provided by GTAC](https://gtacknowledge.extremenetworks.com/articles/How_To/How-can-I-retrieve-a-list-of-BSSIDs-from-an-XCA-controller-using-the-REST-API/).
+It started as a rewrite of [the Python script provided by GTAC](https://gtacknowledge.extremenetworks.com/articles/How_To/How-can-I-retrieve-a-list-of-BSSIDs-from-an-XCA-controller-using-the-REST-API/), but the output of BssidLister includes way more details than the GTAC script by now.
 
 ## Branches
 
@@ -63,6 +63,24 @@ user.
 ## Authentication
 
 BssidLister uses the OAuth authentication model used by XCA's API. Authentication is possible via username/password or via API Client credentials.
+
+## Output
+
+BssidLister prints CSV data to stdout when no errors occur. Any exit code that is not 0 indicates an error of some sort.
+
+The CSV output will contain the following pieces of information _per SSID_:
+
+1. serial: AP serial number
+1. model: AP hardware type
+1. ip: AP IP address
+1. hostname: AP hostname
+1. radio: Radio index
+1. band: Wireless band
+1. bssid: Service BSSID
+1. ssid: Service SSID
+1. disabled: Indictator whether the radio is active (false) or not (true)
+
+A header is included in the first line of the output.
 
 ## Source
 
