@@ -21,7 +21,7 @@ BssidLister uses the modules [godotenv](https://github.com/joho/godotenv), [envo
 1. `go get -u gitlab.com/rbrt-weiler/go-module-envordef`
 1. `go get -u gitlab.com/rbrt-weiler/go-module-xcarestclient`
 
-...before running or compiling GenericNbiClient. All other dependencies are included in a standard Go installation.
+...before running or compiling BssidLister. All other dependencies are included in a standard Go installation.
 
 ## Running / Compiling
 
