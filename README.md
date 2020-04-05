@@ -33,7 +33,7 @@ Tested with [go1.13](https://golang.org/doc/go1.13).
 
 `BssidLister -h`:
 
-<pre>
+```text
 Available options:
   -host string
     	XCA Hostname / IP
@@ -58,7 +58,7 @@ All options that take a value can be set via environment variables:
 Environment variables can also be configured via a file called .xcaenv,
 located in the current directory or in the home directory of the current
 user.
-</pre>
+```
 
 ## Authentication
 
