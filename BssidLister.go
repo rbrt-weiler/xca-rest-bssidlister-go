@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"os"
 	"path"
@@ -202,7 +202,7 @@ func getAccessPoints() (apResultSet, error) {
 	}
 
 	// Read and parse the body of the HTTP response.
-	body, bodyErr := ioutil.ReadAll(res.Body)
+	body, bodyErr := io.ReadAll(res.Body)
 	if bodyErr != nil {
 		return apList, fmt.Errorf("could not read server response: %s", bodyErr)
 	}
@@ -239,7 +239,7 @@ func getAPDetails(serial string) (apDetails, error) {
 	}
 
 	// Read and parse the body of the HTTP response.
-	body, bodyErr := ioutil.ReadAll(res.Body)
+	body, bodyErr := io.ReadAll(res.Body)
 	if bodyErr != nil {
 		return details, fmt.Errorf("could not read server response: %s", bodyErr)
 	}
