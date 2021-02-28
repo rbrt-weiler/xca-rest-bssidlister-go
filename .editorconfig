@@ -9,9 +9,6 @@ tab_width = 4
 trim_trailing_whitespace = false
 insert_final_newline = false
 
-[{*.md,*.yml}]
+[{*.md,*.txt,*.yml}]
 indent_style = space
 indent_size = 2
-
-[LICENSE]
-indent_style = space
