@@ -1,0 +1,6 @@
+github.com/joho/godotenv v1.3.0 h1:Zjp+RcGpHhGlrMbJzXTrZZPrWj+1vfm90La1wgB6Bhc=
+github.com/joho/godotenv v1.3.0/go.mod h1:7hK45KPybAkOC6peb+G5yklZfMxEjkZhHbwpqxOKXbg=
+gitlab.com/rbrt-weiler/go-module-envordef v0.1.2 h1:eMYm0JkCNcbjCOt8WbABY5Lck2EuUtkuXOXgatIFnYY=
+gitlab.com/rbrt-weiler/go-module-envordef v0.1.2/go.mod h1:P3P7hrG+ADeFHAtJsSNzg+z4E5nsKGgHKTkSwZIiQPs=
+gitlab.com/rbrt-weiler/go-module-xcarestclient v0.0.5 h1:zRbvp6e5pck5g8aTO5JDLNYNS00NqvmPOlNKjpH3tSU=
+gitlab.com/rbrt-weiler/go-module-xcarestclient v0.0.5/go.mod h1:HYsluG7PrIsopJ8XXAVZ/fJ1U/3GRtvJw0TiPLr5j8U=
