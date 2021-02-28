@@ -15,6 +15,24 @@ import (
 	xcarestclient "gitlab.com/rbrt-weiler/go-module-xcarestclient"
 )
 
+// Definitions used within the code.
+const (
+	toolName     string = "BssidLister.go"
+	toolVersion  string = "0.3.1"
+	toolID       string = toolName + "/" + toolVersion
+	toolURL      string = "https://gitlab.com/rbrt-weiler/xca-rest-bssidlister-go"
+	envFileName  string = ".xcaenv"
+	jsonMimeType string = "application/json"
+)
+
+// Error codes.
+const (
+	errSuccess int = 0  // No error
+	errUsage   int = 1  // Usage error
+	errXCAAuth int = 10 // Authentication error
+	errAPICall int = 11 // API Call error
+)
+
 // AppConfig stores the application configuration once parsed by flags.
 type appConfig struct {
 	XCAHost      string
@@ -149,24 +167,6 @@ type apDetails struct {
 	SupportedCountries      []string      `json:"supportedCountries"`
 	Features                []string      `json:"features"`
 }
-
-// Definitions used within the code.
-const (
-	toolName     string = "BssidLister.go"
-	toolVersion  string = "0.3.0"
-	toolID       string = toolName + "/" + toolVersion
-	toolURL      string = "https://gitlab.com/rbrt-weiler/xca-rest-bssidlister-go"
-	envFileName  string = ".xcaenv"
-	jsonMimeType string = "application/json"
-)
-
-// Error codes.
-const (
-	errSuccess int = 0  // No error
-	errUsage   int = 1  // Usage error
-	errXCAAuth int = 10 // Authentication error
-	errAPICall int = 11 // API Call error
-)
 
 // Variables used to pass data between functions.
 var (
