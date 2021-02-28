@@ -21,7 +21,7 @@ This tool uses Go modules to handle dependencies.
 
 Use `go run ./...` to run the tool directly or `go build -o BssidLister ./...` to compile a binary. Prebuilt binaries may be available as artifacts from the GitLab CI/CD [pipeline for tagged releases](https://gitlab.com/rbrt-weiler/xca-rest-bssidlister-go/pipelines?scope=tags).
 
-Tested with [go1.13](https://golang.org/doc/go1.13).
+Tested with [go1.16](https://golang.org/doc/go1.16).
 
 ## Usage
 
